@@ -14,7 +14,6 @@ const systemPrompt = 'You are an helpful customer support assistant';
 export async function POST(req) {
   // Parse the JSON body of the incoming request
   const data = await req.json();
-  console.log(data)
   // Create a chat completion request to the OpenAI API
   const completion = await openai.chat.completions.create({
     messages: [

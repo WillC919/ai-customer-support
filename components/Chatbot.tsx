@@ -105,10 +105,12 @@ const Chatbot: React.FC = () => {
                   display: 'inline-block',
                   bgcolor: msg.roles === 'user' ? 'primary.main' : 'grey.300',
                   color: msg.roles === 'user' ? 'white' : 'black',
-                  borderRadius: 20,
+                  borderRadius: 3,
                   p: 1,
                   paddingLeft: 3,
                   paddingRight: 3,
+                  paddingTop: 1,
+                  paddingBottom: 1,
                   mb: 1,
                 }}
               >
