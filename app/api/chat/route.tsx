@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 // Configure OpenAI client with base URL and API key
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: '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', // Use environment variable for API key
+  apiKey: process.env.OPENROUTER_API_KEY, // Use environment variable for API key
 });
 
 // System prompt for the AI, providing guidelines on how to respond to users
