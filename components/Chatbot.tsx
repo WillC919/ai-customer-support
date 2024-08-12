@@ -6,17 +6,17 @@ import ReactMarkdown from 'react-markdown';
 
 // Define the shape of a message according to the OpenAI API schema
 interface Message {
-  roles: string;
+  role: string;
   content: string;
 }
 
 const MessageComponent: React.FC<{ message: Message }> = ({ message }) => (
-  <Box sx={{ textAlign: message.roles === 'user' ? 'right' : 'left' }}>
+  <Box sx={{ textAlign: message.role === 'user' ? 'right' : 'left' }}>
     <Typography
       sx={{
         display: 'inline-block',
-        bgcolor: message.roles === 'user' ? 'primary.main' : 'grey.300',
-        color: message.roles === 'user' ? 'white' : 'black',
+        bgcolor: message.role === 'user' ? 'primary.main' : 'grey.300',
+        color: message.role === 'user' ? 'white' : 'black',
         borderRadius: 3,
         p: 1,
         paddingLeft: 3,
@@ -41,11 +41,11 @@ const Chatbot: React.FC = () => {
 
     setLoading(true);
 
-    const userMessage = { roles: 'user', content: input };
+    const userMessage = { role: 'user', content: input };
     setMessages((messages: Message[]) => [
       ...messages,
       userMessage,
-      { roles: 'system', content: '' },
+      { role: 'Assistant', content: '...' },
     ]);
     setInput('');
 
@@ -53,32 +53,25 @@ const Chatbot: React.FC = () => {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify([...messages, userMessage]),
+        body: JSON.stringify(userMessage.content),
       });
 
       if (!response.ok) throw new Error('Network response was not ok');
 
-      const reader = response.body!.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const text = decoder.decode(value, { stream: true });
-        setMessages((messages) => {
-          const lastMessage = messages[messages.length - 1];
-          const otherMessages = messages.slice(0, messages.length - 1);
-          return [
-            ...otherMessages,
-            { ...lastMessage, content: lastMessage.content + text },
-          ];
-        });
-      }
+      const data = await response.json();
+      setMessages((messages) => {
+        const lastMessage = messages[messages.length - 1];
+        const otherMessages = messages.slice(0, messages.length - 1);
+        return [
+          ...otherMessages,
+          { ...lastMessage, content: data.content || '' },
+        ];
+      });
     } catch (error) {
       console.error('Error:', error);
       setMessages((messages: Message[]) => [
         ...messages.slice(0, messages.length - 1),
-        { roles: 'system', content: "I'm sorry, but I encountered an error. Please try again later." },
+        { role: 'Assistant', content: "I'm sorry, but I encountered an error. Please try again later." },
       ]);
     }
 
